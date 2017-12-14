@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runnable {
-    private List<Edge> neighbourEdges = new List<Edge>();
+    private List<Edges> neighbourEdges;
 
-    public void setNeighbourEdges(List<Edge> neighbourEdges) {
+    public void setNeighbourEdges(List<Edges> neighbourEdges) {
         this.neighbourEdges = neighbourEdges;
     }
 
-    public List<Edge> getNeighbourEdges() {
+    public List<Edges> getNeighbourEdges() {
         return this.neighbourEdges;
     }
 
