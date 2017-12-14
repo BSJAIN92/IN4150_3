@@ -1,4 +1,4 @@
-import com.sun.javafx.geom.Edge;
+
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -26,9 +26,9 @@ import java.util.Map;
 
         public void reset() throws RemoteException;
 
-        public void setNeighbourEdges() throws RemoteException;
+        public void setNeighbourEdges(List<Edges> neighbourEdges) throws RemoteException;
 
-        public List<Edge> getNeighbourEdges() throws RemoteException;
+        public List<Edges> getNeighbourEdges() throws RemoteException;
 
         public void setFragmentLevel(int fragmentLevel) throws RemoteException;
 
@@ -46,17 +46,17 @@ import java.util.Map;
 
         public String getStatus() throws RemoteException;
 
-        public void setMoeCandidate(Edge moeCandidate) throws RemoteException;
+        public void setMoeCandidate(Edges moeCandidate) throws RemoteException;
 
-        public Edge getMoeCandidate() throws RemoteException;
+        public Edges getMoeCandidate() throws RemoteException;
 
-        public void setnumberReportMessagesExpected(int numberReportMessagesExpected) throws RemoteException;
+        public void setNumberReportMessagesExpected(int numberReportMessagesExpected) throws RemoteException;
 
-        public int getnumberReportMessagesExpected() throws RemoteException;
+        public int getNumberReportMessagesExpected() throws RemoteException;
 
-        public void setStatusOfEdge(Map<Edge, String> statusOfEdge) throws RemoteException;
+        public void setStatusOfEdge(Map<Edges, String> statusOfEdge) throws RemoteException;
 
-        public Map<Edge, String> getStatusOfEdge() throws RemoteException;
+        public Map<Edges, String> getStatusOfEdge() throws RemoteException;
     }
 
 

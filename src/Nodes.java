@@ -1,4 +1,4 @@
-import com.sun.javafx.geom.Edge;
+
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -77,13 +77,13 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * Determines the status of the node (Sleep, Find, Found)
      */
 
-    private Edge moeCandidate;
+    private Edges moeCandidate;
 
-    public void setMoeCandidate(Edge moeCandidate)  {
+    public void setMoeCandidate(Edges moeCandidate)  {
         this.moeCandidate = moeCandidate;
     }
 
-    public Edge getMoeCandidate()  {
+    public Edges getMoeCandidate()  {
         return this.moeCandidate;
     }
 
@@ -105,13 +105,13 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * Number of report messages to be received
      */
 
-    private Map<Edge, String> statusOfEdge;
+    private Map<Edges, String> statusOfEdge;
 
-    public void setStatusOfEdge(Map<Edge, String> statusOfEdge) {
+    public void setStatusOfEdge(Map<Edges, String> statusOfEdge) {
         this.statusOfEdge = statusOfEdge;
     }
 
-    public Map<Edge, String> getStatusOfEdge()  {
+    public Map<Edges, String> getStatusOfEdge()  {
         return this.statusOfEdge;
     }
 
