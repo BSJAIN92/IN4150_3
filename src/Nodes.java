@@ -5,6 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.*;
 
 public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runnable {
     private List<Edges> neighbourEdges;
@@ -35,13 +36,13 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * The level of the fragment, the node belongs to.
      */
 
-    private String fragmentName;
+    private int fragmentName;
 
-    public void setFragmentName(String fragmentName)  {
+    public void setFragmentName(int fragmentName)  {
         this.fragmentName = fragmentName;
     }
 
-    public String getFragmentName() {
+    public int getFragmentName() {
         return this.fragmentName;
     }
 
@@ -74,7 +75,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     }
 
     /*
-     * Determines the status of the node (Sleep, Find, Found)
+     * Determines the status of the node ("Sleeping", "Find", "Found")
      */
 
     private Edges moeCandidate;
@@ -150,11 +151,43 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     }
 
 	/*
+	 * Total number of servers or total nodes in the graph
+	 */
+    
+    private int totalServers;
+    
+    /*
+     * get total servers
+     */
+    
+    public int getTotalServers() {
+		return totalServers;
+	}
+    
+    /*
+     * set total servers
+     */
+    
+	public void setTotalServers(int totalServers) {
+		this.totalServers = totalServers;
+	}
+	
+	/*
 	 * Default Constructor
 	 */
-
-    protected Nodes(int totalServers, int serverIndex) throws RemoteException {
+    
+	protected Nodes(int totalServers, int serverIndex) throws RemoteException {
         super();
+        
+        
+        this.serverIndex = serverIndex;
+        this.totalServers = totalServers;
+        this.status = "Sleeping";
+        
+        statusOfEdge = new HashMap<Edges, String>();
+        for (int i = 0; i < neighbourEdges.size(); i++) {
+        	this.statusOfEdge.put(neighbourEdges.get(i), "?_in_MST");
+        }
     }
 
 	/*
@@ -174,4 +207,6 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     public void run() {
         logger.info("Server successfully initialized and started");
     }
+    
+    
 }
