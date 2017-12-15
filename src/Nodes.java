@@ -111,7 +111,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * Message buffer containing connect requests
      */
 
-    public LinkedList<Message> messageQueue = new LinkedList<Message>;
+    public LinkedList<Message> messageQueue = new LinkedList<Message>();
 
     public LinkedList<Message> getMessageQueue() {
         return messageQueue;
@@ -208,6 +208,21 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         logger.info("Server successfully initialized and started");
     }
     
+
+    public void wakeup() {
+    	Edges minimumWeightEdge = new Edges(0);
+    	for (int i = 0; i < neighbourEdges.size(); i++) {
+    		if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
+    			minimumWeightEdge = neighbourEdges.get(i);
+    		}
+    	}
+    	minimumWeightEdge.setStatus("in_MST");
+    	this.fragmentLevel = 0;
+    	this.status = "Found";
+    	this.numberReportMessagesExpected = 0;
+    	
+    }
+    
     /*
      * Receiving a connect message
      * A connect message must contain: senderNode, receiverNode, edge
@@ -216,7 +231,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
     public void receiveConnectMessage(ConnectMessage C){
         if(this.status == "sleeping"){
-            this.wakeUp();
+            this.wakeup();
         }
         if(C.getSenderNode().getFragmentLevel()<this.getFragmentLevel()) {
             C.Edge.setStatus("inMST");
@@ -232,11 +247,12 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     }
 
 
-}
+
 
     /*
      * A node waking up
      */
+
 
 
     /*
@@ -249,5 +265,6 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 	
 	
 	
+
     
 }
