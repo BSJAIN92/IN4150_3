@@ -220,7 +220,22 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	this.fragmentLevel = 0;
     	this.status = "Found";
     	this.numberReportMessagesExpected = 0;
+    	sendConnectMessage(minimumWeightEdge, this.fragmentLevel);
+    }
+    
+    public void sendConnectMessage(Edges minimumWeightEdge, int fragmentLevel) {
+    	int src = this.serverIndex;
+    	int dest;
     	
+    	if (minimumWeightEdge.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+    		dest = minimumWeightEdge.getConnectedNodes().get(1).getServerIndex();
+    	}
+    	else {
+    		dest = minimumWeightEdge.getConnectedNodes().get(0).getServerIndex();
+    	}
+    	
+    	Connect_Message C = new Connect_Message(src, dest);
+    	receiveConnectMessage(C, fragmentLevel);
     }
     
     /*

@@ -5,25 +5,25 @@ public interface Message_Interface {
 	 * get source node
 	 */
 	
-	public Nodes getSrc();
+	public int getSrc();
 	
 	/*
 	 * set source node
 	 */
 	
-	public void setSrc(Nodes src);
+	public void setSrc(int src);
 	
 	/*
 	 * get source node
 	 */
 	
-	public Nodes getDest();
+	public int getDest();
 	
 	/*
 	 * set source node
 	 */
 	
-	public void setDest(Nodes dest);
+	public void setDest(int dest);
 	
 	/*
 	 * get connecting edge

@@ -5,13 +5,13 @@ public class Message implements Message_Interface{
 	 * source node - node sending the message
 	 */
 	
-	Nodes src;
+	int src;
 	
 	/*
 	 * destination node - node receiving the message
 	 */
 	
-	Nodes dest;
+	int dest;
 	
 	/*
 	 * edge connecting the source and destination nodes
@@ -23,7 +23,7 @@ public class Message implements Message_Interface{
 	 * get source node
 	 */
 	
-	public Nodes getSrc() {
+	public int getSrc() {
 		return this.src;
 	}
 	
@@ -31,7 +31,7 @@ public class Message implements Message_Interface{
 	 * set source node
 	 */
 	
-	public void setSrc(Nodes src) {
+	public void setSrc(int src) {
 		this.src = src;
 	}
 	
@@ -39,7 +39,7 @@ public class Message implements Message_Interface{
 	 * get source node
 	 */
 	
-	public Nodes getDest() {
+	public int getDest() {
 		return this.dest;
 	}
 	
@@ -47,7 +47,7 @@ public class Message implements Message_Interface{
 	 * set source node
 	 */
 	
-	public void setDest(Nodes dest) {
+	public void setDest(int dest) {
 		this.dest = dest;
 	}
 	
