@@ -238,7 +238,6 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * A node waking up
      */
 
-    public void wakeUp(){}
 
     /*
      * Sending initiate message
