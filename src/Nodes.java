@@ -106,20 +106,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * Number of report messages to be received
      */
 
-    private Map<Edges, String> statusOfEdge;
-
-    public void setStatusOfEdge(Map<Edges, String> statusOfEdge) {
-        this.statusOfEdge = statusOfEdge;
-    }
-
-    public Map<Edges, String> getStatusOfEdge()  {
-        return this.statusOfEdge;
-    }
-
-    /*
-     * Status of process' adjacent edges. For loop needed to fill the values
-     */
-
+    
     private static final long serialVersionUID = 4745507L;
 
 	/*
@@ -184,10 +171,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         this.totalServers = totalServers;
         this.status = "Sleeping";
         
-        statusOfEdge = new HashMap<Edges, String>();
-        for (int i = 0; i < neighbourEdges.size(); i++) {
-        	this.statusOfEdge.put(neighbourEdges.get(i), "?_in_MST");
-        }
+        
     }
 
 	/*

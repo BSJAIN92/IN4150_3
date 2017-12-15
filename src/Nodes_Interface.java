@@ -54,9 +54,6 @@ import java.util.Map;
 	
 	public int getNumberReportMessagesExpected() throws RemoteException;
 	
-	public void setStatusOfEdge(Map<Edges, String> statusOfEdge) throws RemoteException;
-	
-	public Map<Edges, String> getStatusOfEdge() throws RemoteException;
 	
 	/*
 	 * get total servers

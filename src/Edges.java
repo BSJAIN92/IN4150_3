@@ -134,5 +134,9 @@ public class Edges implements Edges_Interface{
         return this.status;
     }
     
+    protected Edges(int weight) {
+    	this.status = "?_in_MST";
+    	this.weight = weight;
+    }
     
 }
