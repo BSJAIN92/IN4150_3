@@ -106,6 +106,22 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * Number of report messages to be received
      */
 
+	
+    /*
+     * Message buffer containing connect requests
+     */
+
+    public LinkedList<Message> messageQueue = new LinkedList<Message>;
+
+    public LinkedList<Message> getMessageQueue() {
+        return messageQueue;
+    }
+
+    public void setMessageQueue(LinkedList<Message> messageQueue) {
+        this.messageQueue = messageQueue;
+    }
+
+
     
     private static final long serialVersionUID = 4745507L;
 
@@ -192,5 +208,47 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         logger.info("Server successfully initialized and started");
     }
     
+    /*
+     * Receiving a connect message
+     * A connect message must contain: senderNode, receiverNode, edge
+     * sendInitiateMessage must contain LN+1, w(j), status of senderNode
+     */
+
+    public void receiveConnectMessage(ConnectMessage C){
+        if(this.status == "sleeping"){
+            this.wakeUp();
+        }
+        if(C.getSenderNode().getFragmentLevel()<this.getFragmentLevel()) {
+            C.Edge.setStatus("inMST");
+            sendInitiateMessage(C.senderNode, this.getFragmentLevel(), C.Edge.weight, this.status);
+            if (this.status == "find") {
+                numberReportMessagesExpected++;
+            }
+        }
+        else{
+            if(C.edge.status == "?_in_MST"){messageQueue.add(C);}
+            else{sendInitiateMessage(C.senderNode, this.getFragmentLevel()+1, C.edge.weight, "find");}
+        }
+    }
+
+
+}
+
+    /*
+     * A node waking up
+     */
+
+    public void wakeUp(){}
+
+    /*
+     * Sending initiate message
+     * requires senderNode, receiverNode, Edge, levelFragment(senderNode), nameFragment(senderNode), statusEdge,
+     */
+
+    public void sendInitiateMessage() {
+    }
+	
+	
+	
     
 }
