@@ -1,5 +1,3 @@
-
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
@@ -106,7 +104,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * Number of report messages to be received
      */
 
-	
+
     /*
      * Message buffer containing connect requests
      */
@@ -122,7 +120,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     }
 
 
-    
+
     private static final long serialVersionUID = 4745507L;
 
 	/*
@@ -156,38 +154,38 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 	/*
 	 * Total number of servers or total nodes in the graph
 	 */
-    
+
     private int totalServers;
-    
+
     /*
      * get total servers
      */
-    
+
     public int getTotalServers() {
-		return totalServers;
-	}
-    
+        return totalServers;
+    }
+
     /*
      * set total servers
      */
-    
-	public void setTotalServers(int totalServers) {
-		this.totalServers = totalServers;
-	}
-	
+
+    public void setTotalServers(int totalServers) {
+        this.totalServers = totalServers;
+    }
+
 	/*
 	 * Default Constructor
 	 */
-    
-	protected Nodes(int totalServers, int serverIndex) throws RemoteException {
+
+    protected Nodes(int totalServers, int serverIndex) throws RemoteException {
         super();
-        
-        
+
+
         this.serverIndex = serverIndex;
         this.totalServers = totalServers;
         this.status = "Sleeping";
-        
-        
+
+
     }
 
 	/*
@@ -207,67 +205,60 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     public void run() {
         logger.info("Server successfully initialized and started");
     }
-    
+
 
     public void wakeup() {
-    	Edges minimumWeightEdge = new Edges(0);
-    	for (int i = 0; i < neighbourEdges.size(); i++) {
-    		if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
-    			minimumWeightEdge = neighbourEdges.get(i);
-    		}
-    	}
-    	minimumWeightEdge.setStatus("in_MST");
-    	this.fragmentLevel = 0;
-    	this.status = "Found";
-    	this.numberReportMessagesExpected = 0;
-    	sendConnectMessage(minimumWeightEdge, this.fragmentLevel);
+        Edges minimumWeightEdge = new Edges(0);
+        for (int i = 0; i < neighbourEdges.size(); i++) {
+            if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
+                minimumWeightEdge = neighbourEdges.get(i);
+            }
+        }
+        minimumWeightEdge.setStatus("in_MST");
+        this.fragmentLevel = 0;
+        this.status = "Found";
+        this.numberReportMessagesExpected = 0;
+        sendConnectMessage(minimumWeightEdge, this.fragmentLevel);
     }
-    
+
     public void sendConnectMessage(Edges minimumWeightEdge, int fragmentLevel) {
-    	int src = this.serverIndex;
-    	int dest;
-    	
-    	if (minimumWeightEdge.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
-    		dest = minimumWeightEdge.getConnectedNodes().get(1).getServerIndex();
-    	}
-    	else {
-    		dest = minimumWeightEdge.getConnectedNodes().get(0).getServerIndex();
-    	}
-    	
-    	Connect_Message C = new Connect_Message(src, dest);
-    	receiveConnectMessage(C, fragmentLevel);
+        int src = this.serverIndex;
+        int dest;
+
+        if (minimumWeightEdge.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+            dest = minimumWeightEdge.getConnectedNodes().get(1).getServerIndex();
+        }
+        else {
+            dest = minimumWeightEdge.getConnectedNodes().get(0).getServerIndex();
+        }
+
+        Connect_Message C = new Connect_Message(src, dest);
+        receiveConnectMessage(C, fragmentLevel);
     }
-    
+
+
     /*
      * Receiving a connect message
      * A connect message must contain: senderNode, receiverNode, edge
      * sendInitiateMessage must contain LN+1, w(j), status of senderNode
      */
 
-    public void receiveConnectMessage(ConnectMessage C){
+    public void receiveConnectMessage(Connect_Message C, int fragmentLevel){
         if(this.status == "sleeping"){
             this.wakeup();
         }
-        if(C.getSenderNode().getFragmentLevel()<this.getFragmentLevel()) {
-            C.Edge.setStatus("inMST");
-            sendInitiateMessage(C.senderNode, this.getFragmentLevel(), C.Edge.weight, this.status);
+        if(fragmentLevel<this.getFragmentLevel()) {
+            C.channel.setStatus("inMST");
+            sendInitiateMessage(C.channel, this.fragmentLevel, C.channel.weight, this.status);
             if (this.status == "find") {
                 numberReportMessagesExpected++;
             }
         }
         else{
-            if(C.edge.status == "?_in_MST"){messageQueue.add(C);}
-            else{sendInitiateMessage(C.senderNode, this.getFragmentLevel()+1, C.edge.weight, "find");}
+            if(C.channel.status == "?_in_MST"){messageQueue.add(C);}
+            else{sendInitiateMessage(C.channel, this.getFragmentLevel()+1, C.channel.weight, "find");}
         }
     }
-
-
-
-
-    /*
-     * A node waking up
-     */
-
 
 
     /*
@@ -275,11 +266,44 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * requires senderNode, receiverNode, Edge, levelFragment(senderNode), nameFragment(senderNode), statusEdge,
      */
 
-    public void sendInitiateMessage() {
-    }
-	
-	
-	
+    public void sendInitiateMessage(Edges E, int L, int w, String status) {
+        int src = this.serverIndex;
+        int dest;
 
-    
+        if (E.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+            dest = E.getConnectedNodes().get(1).getServerIndex();
+        }
+        else {
+            dest = E.getConnectedNodes().get(0).getServerIndex();
+        }
+
+        Initiate_Message C = new Initiate_Message(src, dest);
+        receiveInitiateMessage(C, L, w, status);
+    }
+
+
+    /*
+     * Receiving Initiate Message
+     */
+
+    public void receiveInitiateMessage(Initiate_Message C, int L, int N, String status) {
+        this.setFragmentLevel(L);
+        this.setFragmentName(N);
+        this.setStatus(status);
+        Nodes dest = null;
+        if(C.channel.connectedNodes.get(0)==this){dest = C.channel.connectedNodes.get(1);}
+        else if(C.channel.connectedNodes.get(1) == this){dest = C.channel.connectedNodes.get(0);}
+        C.channel.setTowardsCore(this, dest);
+        for (int i = 0; i < neighbourEdges.size(); i++) {
+            if(!(neighbourEdges.get(i) == C.channel) && (neighbourEdges.get(i).status == "in_MST")){
+                sendInitiateMessage(neighbourEdges.get(i), this.getFragmentLevel(), this.getFragmentName(), this.status);
+            }
+            if(this.status == "find"){numberReportMessagesExpected++;}
+        }
+        if(this.status == "find"){test();}
+    }
+
+    public void test(){};
+
+
 }
