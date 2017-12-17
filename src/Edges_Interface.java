@@ -18,25 +18,25 @@ public interface Edges_Interface {
 	 * fetch list of nodes connected to the edge
 	 */
 	
-	public List<Nodes> getConnectedNodes();
+	public List<Nodes_Interface> getConnectedNodes();
 	
 	/*
 	 * set the list of nodes the edge is connected to
 	 */
 	
-	public void setConnectedNodes(Nodes firstNode, Nodes secondNode);
+	public void setConnectedNodes(Nodes_Interface firstNode, Nodes_Interface secondNode);
 	
 	/*
 	 * fetch list of nodes for sense of direction for core
 	 */
 	
-	public List<Nodes> getTowardsCore();
+	public List<Nodes_Interface> getTowardsCore();
 	
 	/*
 	 * set source and destination nodes for sense of direction for core
 	 */
 	
-	public void setTowardsCore(Nodes src, Nodes dest);
+	public void setTowardsCore(Nodes src, Nodes_Interface dest);
 	
 	/*
 	 * get information if edge is in fragment
@@ -62,7 +62,8 @@ public interface Edges_Interface {
 	
 	public void setTowardsCandidateMOE(Nodes src, Nodes dest);
 	
+	public void setStatus(String status);
 	
+	public String getStatus();
 	
-
 }

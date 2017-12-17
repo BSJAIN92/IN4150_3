@@ -77,10 +77,11 @@ public class Manage_Servers implements Manage_Servers_Interface{
 		urls = config.getStringArray("node.url");
 		servers = new ArrayList<Nodes_Interface>();
 		int serverIndex = 0;
+		
 		for (String url : urls) {
 			try {
 				
-				Nodes_Interface server = new Nodes(urls.length, serverIndex);
+				Nodes_Interface server = new Nodes(urls, serverIndex);
 				/*
 				 * Starting individual servers and binding url to server
 				 */

@@ -15,14 +15,14 @@ public class Edges implements Edges_Interface{
 	 * Will have 2 values
 	 */
 
-    List<Nodes> connectedNodes;
+    List<Nodes_Interface> connectedNodes = new LinkedList<Nodes_Interface>();
 
 	/*
 	 * List to keep sense of direction for core
 	 * 1st value is source node, 2nd value is destination node
 	 */
 
-    List<Nodes> towardsCore;
+    List<Nodes_Interface> towardsCore;
 
 	/*
 	 * Boolean to store value if the edge is part of a fragment
@@ -57,7 +57,7 @@ public class Edges implements Edges_Interface{
 	 * fetch list of nodes connected to the edge
 	 */
 
-    public List<Nodes> getConnectedNodes(){
+    public List<Nodes_Interface> getConnectedNodes(){
         return this.connectedNodes;
     }
 
@@ -65,7 +65,7 @@ public class Edges implements Edges_Interface{
 	 * set the list of nodes the edge is connected to
 	 */
 
-    public void setConnectedNodes(Nodes firstNode, Nodes secondNode) {
+    public void setConnectedNodes(Nodes_Interface firstNode, Nodes_Interface secondNode) {
         this.connectedNodes.add(firstNode);
         this.connectedNodes.add(secondNode);
     }
@@ -74,7 +74,7 @@ public class Edges implements Edges_Interface{
 	 * fetch list of nodes for sense of direction for core
 	 */
 
-    public List<Nodes> getTowardsCore(){
+    public List<Nodes_Interface> getTowardsCore(){
         return this.towardsCore;
     }
 
@@ -82,7 +82,7 @@ public class Edges implements Edges_Interface{
 	 * set source and destination nodes for sense of direction for core
 	 */
 
-    public void setTowardsCore(Nodes src, Nodes dest) {
+    public void setTowardsCore(Nodes src, Nodes_Interface dest) {
         this.towardsCore.add(src);
         this.towardsCore.add(dest);
     }

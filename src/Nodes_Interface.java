@@ -66,6 +66,35 @@ import java.util.Map;
 	 */
 	
 	public void setTotalServers(int totalServers) throws RemoteException;
+	
+	/*
+	 * Fetch all urls
+	 */
+	
+	public String[] getUrls() throws RemoteException;
+	
+	/*
+	 * set urls
+	 */
+	
+	public void setUrls(String[] urls) throws RemoteException;
+	
+	
+	public void wakeup() throws RemoteException;
+	
+	public void sendConnectMessage(Edges minimumWeightEdge, int fragmentLevel) throws RemoteException;
+	
+	public void receiveConnectMessage(Connect_Message C, int fragmentLevel) throws RemoteException;
+	
+	public void sendInitiateMessage(Edges E, int L, int w, String status) throws RemoteException;
+	
+	public void receiveInitiateMessage(Initiate_Message C, int L, int N, String status) throws RemoteException;
+	
+	public void sendTestMessage() throws RemoteException;
+	
+	public void reportMessage() throws RemoteException;
+	
+	
 }
 
 
