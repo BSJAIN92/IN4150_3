@@ -9,13 +9,13 @@ import java.util.logging.Logger;
 import java.util.*;
 
 public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runnable {
-    private List<Edges> neighbourEdges;
+    private List<Edges_Interface> neighbourEdges = new LinkedList<Edges_Interface>();
 
-    public void setNeighbourEdges(List<Edges> neighbourEdges) {
+    public void setNeighbourEdges(List<Edges_Interface> neighbourEdges) {
         this.neighbourEdges = neighbourEdges;
     }
 
-    public List<Edges> getNeighbourEdges() {
+    public List<Edges_Interface> getNeighbourEdges() {
         return this.neighbourEdges;
     }
 
@@ -234,19 +234,26 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
 
     public void wakeup() {
-        Edges_Interface minimumWeightEdge = new Edges(1000);
-        for (int i = 0; i < neighbourEdges.size(); i++) {
-            if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
-                minimumWeightEdge = neighbourEdges.get(i);
+        
+    	try {
+    		Edges minimumWeightEdge = new Edges(1000);
+            for (int i = 0; i < neighbourEdges.size(); i++) {
+                if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
+                    minimumWeightEdge = (Edges) neighbourEdges.get(i);
+                }
             }
-        }
-        
-        minimumWeightEdge.setStatus("in_MST");
-        this.fragmentLevel = 0;
-        this.status = "Found";
-        this.numberReportMessagesExpected = 0;
-        
-        //sendConnectMessage(minimumWeightEdge, this.fragmentLevel);
+            
+            minimumWeightEdge.setStatus("in_MST");
+            this.fragmentLevel = 0;
+            this.status = "Found";
+            this.numberReportMessagesExpected = 0;
+            
+            sendConnectMessage(minimumWeightEdge, this.fragmentLevel);
+    		
+    	}	catch (RemoteException e) {
+    		e.printStackTrace();
+    	}
+    	
     }
 
     public void sendConnectMessage(Edges minimumWeightEdge, int fragmentLevel) {
@@ -261,8 +268,10 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
             }
         	
         	Connect_Message C = new Connect_Message(src, dest);
+        	C.channel = minimumWeightEdge;
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
-        	destination.receiveConnectMessage(C, fragmentLevel);        	
+        	destination.receiveConnectMessage(C, fragmentLevel); 
+        	
         } catch (RemoteException e1) {
         	e1.printStackTrace();
         }	catch (MalformedURLException e2) {
@@ -283,12 +292,12 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
     public void receiveConnectMessage(Connect_Message C, int fragmentLevel){
         
-    	if(this.status == "sleeping"){
+    	if(this.status == "Sleeping"){
             this.wakeup();
         }
         
     	if(fragmentLevel<this.getFragmentLevel()) {
-            C.channel.setStatus("inMST");
+            C.channel.setStatus("in_MST");
             sendInitiateMessage(C.channel, this.fragmentLevel, C.channel.weight, this.status);
             
             if (this.status == "find") {
@@ -352,37 +361,50 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         }
         
         C.channel.setTowardsCore(this, dest);
-        
-        for (int i = 0; i < neighbourEdges.size(); i++) {
-            
-        	if(!(neighbourEdges.get(i) == C.channel) && (neighbourEdges.get(i).status == "in_MST")){
-                sendInitiateMessage(neighbourEdges.get(i), this.getFragmentLevel(), this.getFragmentName(), this.status);
+        try {
+        	for (int i = 0; i < neighbourEdges.size(); i++) {
+                
+            	if(!(neighbourEdges.get(i) == C.channel) && (neighbourEdges.get(i).getStatus() == "in_MST")){
+                    sendInitiateMessage((Edges) neighbourEdges.get(i), this.getFragmentLevel(), this.getFragmentName(), this.status);
+                }
+                
+                if(this.status == "find"){numberReportMessagesExpected++;}
             }
             
-            if(this.status == "find"){numberReportMessagesExpected++;}
+            if(this.status == "find"){
+            	sendTestMessage();
+            }
+        	
+        }	catch (RemoteException e) {
+        	e.printStackTrace();
         }
         
-        if(this.status == "find"){
-        	sendTestMessage();
-        }
     }
-
+    
+    //Yet to complete sendTestMessage()
+    
     public void sendTestMessage(){
     	
-    	Edges testEdge = new Edges(1000);
-    	
-    	for (int i = 0; i < neighbourEdges.size(); i++) {
-    		if (neighbourEdges.get(i).getStatus() == "?_in_MST" & neighbourEdges.get(i).getWeight() < testEdge.getWeight()) {
-    			testEdge = neighbourEdges.get(i);
-    		}
-    	}
-    	
-    	if (testEdge.getWeight() != 1000) {
+    	try {
+    		Edges testEdge = new Edges(1000);
+        	
+        	for (int i = 0; i < neighbourEdges.size(); i++) {
+        		if (neighbourEdges.get(i).getStatus() == "?_in_MST" & neighbourEdges.get(i).getWeight() < testEdge.getWeight()) {
+        			testEdge = (Edges) neighbourEdges.get(i);
+        		}
+        	}
+        	
+        	if (testEdge.getWeight() != 1000) {
+        		
+        	}
+        	else {
+        		reportMessage();
+        	}
     		
+    	}	catch (RemoteException e) {
+    		e.printStackTrace();
     	}
-    	else {
-    		reportMessage();
-    	}
+    	
     	
     }
     

@@ -66,27 +66,26 @@ public class Unit_Test {
 		Nodes_Interface server3 = servers.get(2);
 		Nodes_Interface server4 = servers.get(3);
 		
-		Edges edge1 = new Edges(1);
-		Edges edge2 = new Edges(2);
-		List<Edges> edge;
-		
-		
-		edge = new LinkedList<Edges>();
-		edge.add(edge1);
-		edge.add(edge2);
-		
-		
 		try {
+			Edges edge1 = new Edges(1);
+			Edges edge2 = new Edges(2);
+			List<Edges_Interface> edge;
+			
+			edge = new LinkedList<Edges_Interface>();
+			edge.add(edge1);
+			edge.add(edge2);
+			
+		
 			server1.setNeighbourEdges(edge);
 			System.out.println(server1.getNeighbourEdges().get(0).getStatus());
 			System.out.println(server1.getNeighbourEdges().get(0).getWeight());
 			
-			server1.wakeup();
+			//server1.wakeup();
 			
-			System.out.println(server1.getNeighbourEdges().get(0).getStatus());
-			System.out.println(server1.getNeighbourEdges().get(1).getWeight());
+			//System.out.println(server1.getNeighbourEdges().get(0).getStatus());
+			//System.out.println(server1.getNeighbourEdges().get(1).getWeight());
 			
-			edge1.setConnectedNodes(server1, server2);
+			//edge1.setConnectedNodes(server1, server2);
 			
 			
 		}	catch (Exception e) {

@@ -1,7 +1,13 @@
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.rmi.RemoteException;
 
 
-public class Edges implements Edges_Interface{
+
+public class Edges extends UnicastRemoteObject implements Edges_Interface{
+	
+	private static final long serialVersionUID = 4745507L;
+
 
 	/*
 	 * Weight of edge
@@ -134,7 +140,7 @@ public class Edges implements Edges_Interface{
         return this.status;
     }
     
-    protected Edges(int weight) {
+    protected Edges(int weight) throws RemoteException{
     	this.status = "?_in_MST";
     	this.weight = weight;
     }

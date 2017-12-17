@@ -26,9 +26,9 @@ import java.util.Map;
 
 	public void reset() throws RemoteException;
 	
-	public void setNeighbourEdges(List<Edges> neighbourEdges) throws RemoteException;
+	public void setNeighbourEdges(List<Edges_Interface> neighbourEdges) throws RemoteException;
 	
-	public List<Edges> getNeighbourEdges() throws RemoteException;
+	public List<Edges_Interface> getNeighbourEdges() throws RemoteException;
 	
 	public void setFragmentLevel(int fragmentLevel) throws RemoteException;
 	
