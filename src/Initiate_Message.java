@@ -6,6 +6,8 @@ public class Initiate_Message extends Message {
         this.src = src;
         this.dest = dest;
     }
+}
+    /*
 
     @Override
     public void setSrc(Nodes src) {
@@ -18,3 +20,4 @@ public class Initiate_Message extends Message {
     }
 
 }
+    */
