@@ -92,8 +92,11 @@ import java.util.Map;
 	
 	public void sendTestMessage() throws RemoteException;
 	
+    public void test() throws RemoteException;
+	
 	public void reportMessage() throws RemoteException;
 	
+	public void receiveTestMessage() throws RemoteException;
 	
 }
 

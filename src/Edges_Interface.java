@@ -38,7 +38,7 @@ public interface Edges_Interface extends Remote{
 	 * set source and destination nodes for sense of direction for core
 	 */
 	
-	public void setTowardsCore(Nodes src, Nodes_Interface dest) throws RemoteException;
+	public void setTowardsCore(Nodes_Interface src, Nodes_Interface dest) throws RemoteException;
 	
 	/*
 	 * get information if edge is in fragment

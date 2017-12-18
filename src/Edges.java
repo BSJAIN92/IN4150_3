@@ -28,7 +28,7 @@ public class Edges extends UnicastRemoteObject implements Edges_Interface{
 	 * 1st value is source node, 2nd value is destination node
 	 */
 
-    List<Nodes_Interface> towardsCore;
+    List<Nodes_Interface> towardsCore = new LinkedList<Nodes_Interface>();
 
 	/*
 	 * Boolean to store value if the edge is part of a fragment
@@ -88,7 +88,7 @@ public class Edges extends UnicastRemoteObject implements Edges_Interface{
 	 * set source and destination nodes for sense of direction for core
 	 */
 
-    public void setTowardsCore(Nodes src, Nodes_Interface dest) {
+    public void setTowardsCore(Nodes_Interface src, Nodes_Interface dest) {
         this.towardsCore.add(src);
         this.towardsCore.add(dest);
     }
