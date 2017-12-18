@@ -1,5 +1,7 @@
 
-public class Message implements Message_Interface{
+import java.io.Serializable;
+
+public class Message implements Message_Interface, Serializable{
 	
 	/*
 	 * source node - node sending the message
@@ -17,7 +19,7 @@ public class Message implements Message_Interface{
 	 * edge connecting the source and destination nodes
 	 */
 	
-	Edges channel;
+	Edges_Interface channel;
 	
 	/*
 	 * get source node
@@ -55,7 +57,7 @@ public class Message implements Message_Interface{
 	 * get connecting edge
 	 */
 	
-	public Edges getChannel() {
+	public Edges_Interface getChannel() {
 		return this.channel;
 	}
 	
@@ -63,7 +65,7 @@ public class Message implements Message_Interface{
 	 * set connecting edge
 	 */
 	
-	public void setChannel(Edges channel) {
+	public void setChannel(Edges_Interface channel) {
 		this.channel = channel;
 	}
 	

@@ -29,12 +29,12 @@ public interface Message_Interface {
 	 * get connecting edge
 	 */
 	
-	public Edges getChannel();
+	public Edges_Interface getChannel();
 	
 	/*
 	 * set connecting edge
 	 */
 	
-	public void setChannel(Edges channel);
+	public void setChannel(Edges_Interface channel);
 
 }

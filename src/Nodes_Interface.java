@@ -82,11 +82,11 @@ import java.util.Map;
 	
 	public void wakeup() throws RemoteException;
 	
-	public void sendConnectMessage(Edges minimumWeightEdge, int fragmentLevel) throws RemoteException;
+	public void sendConnectMessage(Edges_Interface minimumWeightEdge, int fragmentLevel) throws RemoteException;
 	
 	public void receiveConnectMessage(Connect_Message C, int fragmentLevel) throws RemoteException;
 	
-	public void sendInitiateMessage(Edges E, int L, int w, String status) throws RemoteException;
+	public void sendInitiateMessage(Edges_Interface E, int L, int w, String status) throws RemoteException;
 	
 	public void receiveInitiateMessage(Initiate_Message C, int L, int N, String status) throws RemoteException;
 	

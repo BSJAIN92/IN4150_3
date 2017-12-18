@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.*;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.SimpleFormatter;
 
 public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runnable {
     private List<Edges_Interface> neighbourEdges = new LinkedList<Edges_Interface>();
@@ -130,8 +134,10 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 	 * For logging
 	 */
 
+    
     private static Logger logger = Logger.getLogger(Nodes.class.getName());
-
+    ConsoleHandler handler = new ConsoleHandler();
+    
 	/*
 	 * To store url of server
 	 */
@@ -229,48 +235,76 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
 
     public void run() {
+    	logger.setLevel(Level.ALL);
         logger.info("Server successfully initialized and started");
+        
     }
 
 
     public void wakeup() {
         
     	try {
-    		Edges minimumWeightEdge = new Edges(1000);
-            for (int i = 0; i < neighbourEdges.size(); i++) {
+    		logger.info("Inside wakeup funciton of server " + this.getServerIndex());
+    		
+    		Edges e = new Edges(1000);
+    		Edges_Interface minimumWeightEdge;
+    		minimumWeightEdge = (Edges_Interface) e;
+    		
+    		logger.info("Temporary edge of weight "+ e.getWeight());
+    		
+    		for (int i = 0; i < neighbourEdges.size(); i++) {
+            	int w = minimumWeightEdge.getWeight();
                 if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
-                    minimumWeightEdge = (Edges) neighbourEdges.get(i);
+                    minimumWeightEdge = (Edges_Interface) neighbourEdges.get(i);
                 }
             }
             
+    		logger.info("minimum weight edge is: " + minimumWeightEdge.getWeight());
+    		
             minimumWeightEdge.setStatus("in_MST");
             this.fragmentLevel = 0;
             this.status = "Found";
             this.numberReportMessagesExpected = 0;
             
+            logger.info("sending connect message");
+            
             sendConnectMessage(minimumWeightEdge, this.fragmentLevel);
     		
     	}	catch (RemoteException e) {
+    		e.printStackTrace();
+    	}	catch (Exception e) {
     		e.printStackTrace();
     	}
     	
     }
 
-    public void sendConnectMessage(Edges minimumWeightEdge, int fragmentLevel) {
-        int src = this.serverIndex;
+    public void sendConnectMessage(Edges_Interface minimumWeightEdge, int fragmentLevel) {
+        
+    	logger.info("Inside sendConnectMessage");
+    	
+    	int src = this.serverIndex;
         int dest;
+        
         try {
+        	logger.info("inside try");
         	if (minimumWeightEdge.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
                 dest = minimumWeightEdge.getConnectedNodes().get(1).getServerIndex();
+                logger.info("inside if");
             }
             else {
                 dest = minimumWeightEdge.getConnectedNodes().get(0).getServerIndex();
+                logger.info("inside else");
             }
+        	
+        	logger.info("Destination server is: " + dest);
         	
         	Connect_Message C = new Connect_Message(src, dest);
         	C.channel = minimumWeightEdge;
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
-        	destination.receiveConnectMessage(C, fragmentLevel); 
+        	
+            logger.info("Sending connectMessage");
+            
+            destination.receiveConnectMessage(C, fragmentLevel); 
         	
         } catch (RemoteException e1) {
         	e1.printStackTrace();
@@ -278,7 +312,11 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	e2.printStackTrace();
         } catch (NotBoundException e3) {
 			e3.printStackTrace();
-		}	
+		}	catch (Exception e) {
+			logger.warning("error");
+			e.printStackTrace();
+			
+		}
         
         
     }
@@ -292,26 +330,36 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
     public void receiveConnectMessage(Connect_Message C, int fragmentLevel){
         
+    	logger.info(this.serverIndex + " received connectMessage");
+    	
     	if(this.status == "Sleeping"){
             this.wakeup();
         }
         
-    	if(fragmentLevel<this.getFragmentLevel()) {
-            C.channel.setStatus("in_MST");
-            sendInitiateMessage(C.channel, this.fragmentLevel, C.channel.weight, this.status);
-            
-            if (this.status == "find") {
-                numberReportMessagesExpected++;
-            }
-        }
-        else{
-            if(C.channel.status == "?_in_MST"){
-            	messageQueue.add(C);
+    	try {
+    		if(fragmentLevel<this.getFragmentLevel()) {
+                C.channel.setStatus("in_MST");
+                //sendInitiateMessage(C.channel, this.fragmentLevel, C.channel.getWeight(), this.status);
+                
+                if (this.status == "find") {
+                    numberReportMessagesExpected++;
+                }
             }
             else{
-            	sendInitiateMessage(C.channel, this.getFragmentLevel()+1, C.channel.weight, "find");
+                if(C.channel.getStatus() == "?_in_MST"){
+                	messageQueue.add(C);
+                }
+                else{
+                	//sendInitiateMessage(C.channel, this.getFragmentLevel()+1, C.channel.getWeight(), "find");
+                }
             }
-        }
+    		
+    	}	catch (RemoteException e) {
+    		e.printStackTrace();
+    	}	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
     }
 
 
@@ -320,7 +368,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
      * requires senderNode, receiverNode, Edge, levelFragment(senderNode), nameFragment(senderNode), statusEdge,
      */
 
-    public void sendInitiateMessage(Edges E, int L, int w, String status) {
+    public void sendInitiateMessage(Edges_Interface E, int L, int w, String status) {
         int src = this.serverIndex;
         int dest;
         
@@ -336,6 +384,8 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
             receiveInitiateMessage(C, L, w, status);
         	
         }	catch (RemoteException e) {
+        	e.printStackTrace();
+        }	catch (Exception e) {
         	e.printStackTrace();
         }
         
@@ -353,15 +403,17 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         this.setStatus(status);
         Nodes_Interface dest = null;
         
-        if(C.channel.connectedNodes.get(0)==this){
-        	dest = C.channel.connectedNodes.get(1);
-        }
-        else if(C.channel.connectedNodes.get(1) == this){
-        	dest = C.channel.connectedNodes.get(0);
-        }
         
-        C.channel.setTowardsCore(this, dest);
         try {
+        	if(C.channel.getConnectedNodes().get(0)==this){
+            	dest = C.channel.getConnectedNodes().get(1);
+            }
+            else if(C.channel.getConnectedNodes().get(1) == this){
+            	dest = C.channel.getConnectedNodes().get(0);
+            }
+            
+            C.channel.setTowardsCore(this, dest);
+            
         	for (int i = 0; i < neighbourEdges.size(); i++) {
                 
             	if(!(neighbourEdges.get(i) == C.channel) && (neighbourEdges.get(i).getStatus() == "in_MST")){
@@ -376,6 +428,8 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
             }
         	
         }	catch (RemoteException e) {
+        	e.printStackTrace();
+        }	catch (Exception e) {
         	e.printStackTrace();
         }
         
@@ -402,6 +456,8 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	}
     		
     	}	catch (RemoteException e) {
+    		e.printStackTrace();
+    	}	catch (Exception e) {
     		e.printStackTrace();
     	}
     	
