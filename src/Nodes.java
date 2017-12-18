@@ -80,22 +80,23 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     }
 
     /*
-     * Determines the status of the node ("Sleeping", "Find", "Found")
+     * Determines the status of the node ("Sleeping", "find", "found")
      */
 
-    private Edges moeCandidate;
+    private Edges_Interface moeCandidate = new Edges(3000);
 
-    public void setMoeCandidate(Edges moeCandidate)  {
+    public void setMoeCandidate(Edges_Interface moeCandidate)  {
         this.moeCandidate = moeCandidate;
     }
 
-    public Edges getMoeCandidate()  {
+    public Edges_Interface getMoeCandidate()  {
         return this.moeCandidate;
     }
 
     /*
      * Reveals the nodes' minimum-weight outgoing edge
      * value set to 5000 in case of infinity
+     * value set to 3000 in case of nil
      */
 
     private int numberReportMessagesExpected;
@@ -208,7 +209,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
 	/*
 	 * test edge
-	 * default value at 2000
+	 * nil value at 2000
 	 */
 	
 	private Edges_Interface testEdge = new Edges(2000);
@@ -625,18 +626,207 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	
     	logger.info("Inside report function");
     	
+    	
+    	
+    	try {
+    		Edges ed = new Edges(1000);
+    		Edges_Interface toCore;
+    		toCore = (Edges_Interface) ed;
+    		
+    		
+    		if (this.getNumberReportMessagesExpected() == 0 & this.getTestEdge().getWeight() == 2000) {
+        		this.setStatus("found");
+        		
+        		logger.info(this.getServerIndex() + " is sending reportMessage");
+				
+        		for (int i = 0; i < neighbourEdges.size(); i++) {
+            		if (!(neighbourEdges.get(i).getTowardsCore().isEmpty())) {
+            			toCore = (Edges_Interface) neighbourEdges.get(i);
+            			
+            		}
+            	}
+        		
+        		sendReportMessage(toCore, this.getMoeCandidate().getWeight());
+        	}
+        	
+    	}	catch (RemoteException e1) {
+    		e1.printStackTrace();
+    	}	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+    
+    public void sendReportMessage(Edges_Interface toCore, int w) {
+    	
+    	logger.info("Inside sendReportMessage function");
+    	
+    	int src = this.serverIndex;
+        int dest;
+        
+        try {
+        	if (toCore.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+                dest = toCore.getConnectedNodes().get(1).getServerIndex();
+            }
+            else {
+                dest = toCore.getConnectedNodes().get(0).getServerIndex();
+            }
+        	
+        	logger.info("Destination server is: " + dest);
+        	
+        	Report_Message RE = new Report_Message(src, dest);
+        	RE.channel = toCore;
+            Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
+        	
+            logger.info("server " + this.serverIndex + " Sending reportMessage to server " + dest);
+            
+            destination.receiveReportMessage(RE, w); 
+        	
+        } catch (RemoteException e1) {
+        	e1.printStackTrace();
+        }	catch (MalformedURLException e2) {
+        	e2.printStackTrace();
+        } catch (NotBoundException e3) {
+			e3.printStackTrace();
+		}	catch (Exception e) {
+			logger.warning("error");
+			e.printStackTrace();
+			
+		}
+    	
+    }
+    
+    public void receiveReportMessage(Report_Message RE, int w) {
+    	
+    	logger.info("server " + this.serverIndex + " received reportMessage from server " + RE.getSrc());
+    	
+    	
     }
     
     public void sendAcceptMessage(Edges_Interface accept) {
     	
     	logger.info("Inside sendAcceptMessage function");
+    	
+    	int src = this.serverIndex;
+        int dest;
+        
+        try {
+        	if (accept.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+                dest = accept.getConnectedNodes().get(1).getServerIndex();
+            }
+            else {
+                dest = accept.getConnectedNodes().get(0).getServerIndex();
+            }
+        	
+        	logger.info("Destination server is: " + dest);
+        	
+        	Accept_Message A = new Accept_Message(src, dest);
+        	A.channel = accept;
+            Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
+        	
+            logger.info("server " + this.serverIndex + " Sending rejectMessage to server " + dest);
+            
+            destination.receiveAcceptMessage(A); 
+        	
+        } catch (RemoteException e1) {
+        	e1.printStackTrace();
+        }	catch (MalformedURLException e2) {
+        	e2.printStackTrace();
+        } catch (NotBoundException e3) {
+			e3.printStackTrace();
+		}	catch (Exception e) {
+			logger.warning("error");
+			e.printStackTrace();
+			
+		}
     	    	
+    }
+    
+    public void receiveAcceptMessage(Accept_Message A) {
+    	
+    	logger.info("server " + this.serverIndex + " received acceptMessage from server " + A.getSrc());
+    	
+    	try {
+    		
+    		this.testEdge.setWeight(2000);
+    		
+    		if(A.getChannel().getWeight() < moeCandidate.getWeight()) {
+    			moeCandidate = A.getChannel();
+    		}
+    		
+    		logger.info("Calling report function");
+    		
+    		report();
+    		
+    	}	catch (RemoteException e1) {
+    		e1.printStackTrace();
+    	}	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	
     }
     
     
     public void sendRejectMessage(Edges_Interface reject) {
     	
     	logger.info("Inside sendRejectMessage function");
+    	
+    	int src = this.serverIndex;
+        int dest;
+        
+        try {
+        	if (reject.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+                dest = reject.getConnectedNodes().get(1).getServerIndex();
+            }
+            else {
+                dest = reject.getConnectedNodes().get(0).getServerIndex();
+            }
+        	
+        	logger.info("Destination server is: " + dest);
+        	
+        	Reject_Message R = new Reject_Message(src, dest);
+        	R.channel = reject;
+            Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
+        	
+            logger.info("server " + this.serverIndex + " Sending rejectMessage to server " + dest);
+            
+            destination.receiveRejectMessage(R); 
+        	
+        } catch (RemoteException e1) {
+        	e1.printStackTrace();
+        }	catch (MalformedURLException e2) {
+        	e2.printStackTrace();
+        } catch (NotBoundException e3) {
+			e3.printStackTrace();
+		}	catch (Exception e) {
+			logger.warning("error");
+			e.printStackTrace();
+			
+		}
+    	
+    	
+    }
+    
+    public void receiveRejectMessage(Reject_Message R) {
+    	
+    	logger.info("server " + this.serverIndex + " received rejectMessage from server " + R.getSrc());
+    	
+    	try {
+    		
+    		if (R.getChannel().getStatus().equals("?_in_MST")) {
+        		R.getChannel().setStatus("not_in_MST");
+        	}
+        	
+        	logger.info("server " + this.getServerIndex() + " is Calling test function");
+        	
+        	test();
+        	
+    	}	catch (RemoteException e1) {
+    		e1.printStackTrace();
+    	}	catch (Exception e) {
+    		e.printStackTrace();
+    	}
     	
     }
     

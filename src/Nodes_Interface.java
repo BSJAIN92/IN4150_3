@@ -46,9 +46,9 @@ import java.util.Map;
 	
 	public String getStatus() throws RemoteException;
 	
-	public void setMoeCandidate(Edges moeCandidate) throws RemoteException;
+	public void setMoeCandidate(Edges_Interface moeCandidate) throws RemoteException;
 	
-	public Edges getMoeCandidate() throws RemoteException;
+	public Edges_Interface getMoeCandidate() throws RemoteException;
 	
 	public void setNumberReportMessagesExpected(int numberReportMessagesExpected) throws RemoteException;
 	
@@ -99,11 +99,19 @@ import java.util.Map;
 	
 	public void report() throws RemoteException;
 	
+	public void sendReportMessage(Edges_Interface toCore, int w) throws RemoteException;
+	
+	public void receiveReportMessage(Report_Message RE, int w) throws RemoteException;
+	
 	public void receiveTestMessage(Test_Message T, int fragmentLevel, int fragmentName) throws RemoteException;
 	
 	public void sendAcceptMessage(Edges_Interface accept) throws RemoteException;
 	
 	public void sendRejectMessage(Edges_Interface reject) throws RemoteException;
+	
+	public void receiveRejectMessage(Reject_Message R) throws RemoteException;
+	
+	public void receiveAcceptMessage(Accept_Message A) throws RemoteException;
 }
 
 
