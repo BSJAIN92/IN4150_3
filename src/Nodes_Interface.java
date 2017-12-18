@@ -79,6 +79,9 @@ import java.util.Map;
 	
 	public void setUrls(String[] urls) throws RemoteException;
 	
+	public Edges_Interface getTestEdge()  throws RemoteException;
+	
+	public void setTestEdge(Edges_Interface testEdge) throws RemoteException;
 	
 	public void wakeup() throws RemoteException;
 	
@@ -90,14 +93,17 @@ import java.util.Map;
 	
 	public void receiveInitiateMessage(Initiate_Message C, int L, int N, String status) throws RemoteException;
 	
-	public void sendTestMessage() throws RemoteException;
+	public void sendTestMessage(Edges_Interface test, int fragmentLevel, int fragmentName) throws RemoteException;
 	
     public void test() throws RemoteException;
 	
-	public void reportMessage() throws RemoteException;
+	public void report() throws RemoteException;
 	
-	public void receiveTestMessage() throws RemoteException;
+	public void receiveTestMessage(Test_Message T, int fragmentLevel, int fragmentName) throws RemoteException;
 	
+	public void sendAcceptMessage(Edges_Interface accept) throws RemoteException;
+	
+	public void sendRejectMessage(Edges_Interface reject) throws RemoteException;
 }
 
 

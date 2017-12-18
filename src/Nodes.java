@@ -206,6 +206,21 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 	}
 	
     
+	/*
+	 * test edge
+	 * default value at 2000
+	 */
+	
+	private Edges_Interface testEdge = new Edges(2000);
+	
+	public Edges_Interface getTestEdge() {
+		return this.testEdge;
+	}
+	
+	public void setTestEdge(Edges_Interface testEdge) {
+		this.testEdge = testEdge;
+	}
+	
     /*
 	 * Default Constructor
 	 */
@@ -348,11 +363,14 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
             }
             else{
                 if(C.channel.getStatus() == "?_in_MST"){
+                	
+                	logger.info("Adding to message queue");
+                	
                 	messageQueue.add(C);
                 }
                 else{
                 	
-                	logger.info("server " + this.serverIndex + " Sending initiateMessage");
+                	logger.info("server " + this.serverIndex + " Sending initiateMessage with find");
                     
                 	sendInitiateMessage(C.channel, this.getFragmentLevel()+1, C.channel.getWeight(), "find");
                 }
@@ -418,13 +436,14 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
     public void receiveInitiateMessage(Initiate_Message C, int L, int N, String status) {
         
-    	logger.info("server " + this.serverIndex + " received connectMessage from server " + C.getSrc());
+    	logger.info("server " + this.serverIndex + " received initiateMessage from server " + C.getSrc());
     	
     	this.setFragmentLevel(L);
         this.setFragmentName(N);
         this.setStatus(status);
         int dest;
         
+        logger.info("status is " + this.getStatus());
         
         try {
         	if(C.channel.getConnectedNodes().get(0).getServerIndex()==this.getServerIndex()){
@@ -446,15 +465,22 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
                     
             		logger.info("server " + this.serverIndex + " Sending initiateMessage");
                     
-            		sendInitiateMessage((Edges) neighbourEdges.get(i), this.getFragmentLevel(), this.getFragmentName(), this.status);
+            		sendInitiateMessage( neighbourEdges.get(i), this.getFragmentLevel(), this.getFragmentName(), this.status);
             		
-                    if(this.status == "find"){numberReportMessagesExpected++;}
+                    if(this.status == "find"){
+                    	numberReportMessagesExpected++;
+                    }
                 }
                 
             }
             
-            if(this.status == "find"){
-            	//test();
+        	logger.info("status is " + this.getStatus());
+        	
+            if(this.getStatus().equals("find")){
+            	
+            	logger.info("server " + this.getServerIndex() + " is Calling test function");
+            	
+            	test();
             }
         	
         }	catch (RemoteException e) {
@@ -468,21 +494,30 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void test() {
     	
+    	logger.info("Inside test function");
+    	
     	try {
-    		Edges testEdge = new Edges(1000);
-        	
+    		
         	for (int i = 0; i < neighbourEdges.size(); i++) {
         		if (neighbourEdges.get(i).getStatus() == "?_in_MST" & neighbourEdges.get(i).getWeight() < testEdge.getWeight()) {
-        			testEdge = (Edges) neighbourEdges.get(i);
-        			//sendTestMessage();
+        			this.testEdge = neighbourEdges.get(i);
+        			
         		}
         	}
         	
-        	if (testEdge.getWeight() != 1000) {
+        	logger.info("The weight of test edge is: " + testEdge.getWeight());
+        	
+        	if (this.testEdge.getWeight() != 2000) {
         		
+        		logger.info("Sending testMessage");
+                
+        		sendTestMessage(this.testEdge, this.getFragmentLevel(), this.getFragmentName());
         	}
         	else {
-        		reportMessage();
+        		
+        		logger.info("Calling report function");
+        		
+        		report();
         	}
     		
     	}	catch (RemoteException e) {
@@ -495,20 +530,114 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	
     }
     
-    //Yet to complete sendTestMessage()
     
-    public void sendTestMessage(){
+    
+    public void sendTestMessage(Edges_Interface test, int fragmentLevel, int fragmentName){
     	
+    	logger.info("Inside sendTestMessage");
+    	
+    	int src = this.serverIndex;
+        int dest;
+        
+        try {
+        	if (test.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+                dest = test.getConnectedNodes().get(1).getServerIndex();
+            }
+            else {
+                dest = test.getConnectedNodes().get(0).getServerIndex();
+            }
+        	
+        	logger.info("Destination server is: " + dest);
+        	
+        	Test_Message T = new Test_Message(src, dest);
+        	T.channel = test;
+            Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
+        	
+            logger.info("server " + this.serverIndex + " Sending testMessage to server " + dest);
+            
+            destination.receiveTestMessage(T, fragmentLevel, fragmentName); 
+        	
+        } catch (RemoteException e1) {
+        	e1.printStackTrace();
+        }	catch (MalformedURLException e2) {
+        	e2.printStackTrace();
+        } catch (NotBoundException e3) {
+			e3.printStackTrace();
+		}	catch (Exception e) {
+			logger.warning("error");
+			e.printStackTrace();
+			
+		}
+    	
+    }
+    
+    public void receiveTestMessage(Test_Message T, int fragmentLevel, int fragmentName) {
+    	
+    	logger.info("server " + this.serverIndex + " received testMessage from server " + T.getSrc());
+    	
+    	if(this.status == "Sleeping"){
+            this.wakeup();
+    	}
+    	
+    	try {
+    		
+    		if (fragmentLevel > this.getFragmentLevel()) {
+        		this.messageQueue.add(T);
+        	}
+        	
+        	else {
+        		if (fragmentName != this.getFragmentName()) {
+        			
+        			logger.info(this.getServerIndex() + " is sending acceptMessage");
+        			
+        			sendAcceptMessage(T.getChannel());
+        		}
+        		else {
+        			if (T.getChannel().getStatus().equals("?_in_MST")) {
+        				T.getChannel().setStatus("not_in_MST");
+        			}
+        			
+        			if (!(this.getTestEdge().equals(T.getChannel()))) {
+        				
+        				logger.info(this.getServerIndex() + " is sending rejectMessage");
+        				
+        				sendRejectMessage(T.getChannel());
+        			}
+        			else {
+        				logger.info("server " + this.getServerIndex() + " is Calling test function");
+                    	
+                    	test();
+        			}
+        		}
+        	}
+    		
+    	}	catch (RemoteException e1) {
+    		e1.printStackTrace();
+    	}	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	
+    
+    }
+    
+    public void report() {
+    	
+    	logger.info("Inside report function");
+    	
+    }
+    
+    public void sendAcceptMessage(Edges_Interface accept) {
+    	
+    	logger.info("Inside sendAcceptMessage function");
     	    	
     }
     
-    public void receiveTestMessage() {
+    
+    public void sendRejectMessage(Edges_Interface reject) {
+    	
+    	logger.info("Inside sendRejectMessage function");
     	
     }
     
-    public void reportMessage() {
-    	
-    }
-
-
 }
