@@ -700,6 +700,136 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	
     	logger.info("server " + this.serverIndex + " received reportMessage from server " + RE.getSrc());
     	
+    	try {
+    		
+    		Edges ed = new Edges(1000);
+    		Edges_Interface toCore;
+    		toCore = (Edges_Interface) ed;
+    		
+    		for (int i = 0; i < neighbourEdges.size(); i++) {
+        		if (!(neighbourEdges.get(i).getTowardsCore().isEmpty())) {
+        			toCore = (Edges_Interface) neighbourEdges.get(i);
+        			
+        		}
+        	}
+    		
+    		if (RE.getChannel() != toCore) {
+    			this.numberReportMessagesExpected--;
+    			
+    			if (w < this.getMoeCandidate().getWeight()) {
+    				this.setMoeCandidate(RE.getChannel());
+    			}
+    			
+    			logger.info("Calling report function");
+        		
+    			report();
+    		}
+    		else {
+    			if (this.getStatus().equals("find")) {
+    				this.messageQueue.add(RE);
+    			}
+    			else {
+    				if (w > this.getMoeCandidate().getWeight() & w != 5000 & w != 3000) {
+    					
+    					logger.info("Calling changeRoot function");
+    					
+    					changeRoot();
+    					
+    				}
+    				else {
+    					if (w == this.getMoeCandidate().getWeight() & w == 5000) {
+    						// Do nothing - HALT
+    					}
+    				}
+    			}
+    		}
+    		
+    		
+    		
+    	}	catch (RemoteException e1) {
+    		e1.printStackTrace();
+    	}	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+    
+    public void changeRoot() {
+    	
+    	logger.info("Inside changeRoot function");
+    	
+    	try {
+    		
+    		if (this.getMoeCandidate().getStatus().equals("in_MST")) {
+        		
+    			logger.info(this.getServerIndex() + " is sending changeRootMessage");
+				    			
+    			sendChangeRootMessage(this.getMoeCandidate());
+        	}
+    		else {
+    			
+    			logger.info(this.getServerIndex() + " is sending connectMessage");
+				    			
+    			sendConnectMessage(this.getMoeCandidate(), this.getFragmentLevel());
+    			this.getMoeCandidate().setStatus("in_MST");
+    		}
+        	
+    		
+    	}	catch (RemoteException e1) {
+    		e1.printStackTrace();
+    	}	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+    
+    public void sendChangeRootMessage (Edges_Interface changeRoot) {
+    	
+    	logger.info("Inside sendChangeRootMessage function");
+    	
+    	int src = this.serverIndex;
+        int dest;
+        
+        try {
+        	if (changeRoot.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
+                dest = changeRoot.getConnectedNodes().get(1).getServerIndex();
+            }
+            else {
+                dest = changeRoot.getConnectedNodes().get(0).getServerIndex();
+            }
+        	
+        	logger.info("Destination server is: " + dest);
+        	
+        	Change_Root_Message CR = new Change_Root_Message(src, dest);
+        	CR.channel = changeRoot;
+            Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
+        	
+            logger.info("server " + this.serverIndex + " Sending changeRootMessage to server " + dest);
+            
+            destination.receiveChangeRootMessage(CR); 
+        	
+        } catch (RemoteException e1) {
+        	e1.printStackTrace();
+        }	catch (MalformedURLException e2) {
+        	e2.printStackTrace();
+        } catch (NotBoundException e3) {
+			e3.printStackTrace();
+		}	catch (Exception e) {
+			logger.warning("error");
+			e.printStackTrace();
+			
+		}
+    	
+    }
+    
+    public void receiveChangeRootMessage(Change_Root_Message CR) {
+    	
+    	logger.info("server " + this.serverIndex + " received changeRootMessage from server " + CR.getSrc());
+    	
+    	logger.info("Calling changeRoot function");
+		
+		changeRoot();
+		
     	
     }
     

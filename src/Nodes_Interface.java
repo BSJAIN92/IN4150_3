@@ -103,6 +103,12 @@ import java.util.Map;
 	
 	public void receiveReportMessage(Report_Message RE, int w) throws RemoteException;
 	
+	public void changeRoot() throws RemoteException;
+	
+	public void sendChangeRootMessage (Edges_Interface changeRoot) throws RemoteException;
+	
+	public void receiveChangeRootMessage(Change_Root_Message CR) throws RemoteException;
+	
 	public void receiveTestMessage(Test_Message T, int fragmentLevel, int fragmentName) throws RemoteException;
 	
 	public void sendAcceptMessage(Edges_Interface accept) throws RemoteException;
