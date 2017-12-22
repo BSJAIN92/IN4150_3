@@ -22,6 +22,36 @@ public class Message implements Message_Interface, Serializable{
 	Edges_Interface channel;
 	
 	/*
+	 * Store the type of message
+	 * values:
+	 * Accept_Message = AM
+	 * Change_Root_Message = CRM
+	 * Connect_Message = CM
+	 * Initiate_Message = IM
+	 * Reject_Message = RejM
+	 * Report_Message = RepM
+	 * Test_Message = TM
+	 */
+	
+	String messageType;
+	
+	/*
+	 * get messageType
+	 */
+	
+	public String getMessageType () {
+		return this.messageType;
+	}
+	
+	/*
+	 * set messageType
+	 */
+	
+	public void setMessageType(String messageType) {
+		this.messageType = messageType;
+	}
+	
+	/*
 	 * get source node
 	 */
 	

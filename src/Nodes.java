@@ -269,9 +269,9 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		
     		logger.info("Temporary edge of weight "+ e.getWeight());
     		
+            
     		for (int i = 0; i < neighbourEdges.size(); i++) {
-            	int w = minimumWeightEdge.getWeight();
-                if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
+            	if (minimumWeightEdge.getWeight() > neighbourEdges.get(i).getWeight()){
                     minimumWeightEdge = (Edges_Interface) neighbourEdges.get(i);
                 }
             }
@@ -279,8 +279,9 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		logger.info("minimum weight edge is: " + minimumWeightEdge.getWeight());
     		
             minimumWeightEdge.setStatus("in_MST");
+            logger.info("Edge " + minimumWeightEdge.getWeight() + minimumWeightEdge.getStatus());
             this.fragmentLevel = 0;
-            this.status = "Found";
+            this.status = "found";
             this.numberReportMessagesExpected = 0;
             
             logger.info("server " + this.serverIndex + " sending connect message");
@@ -312,8 +313,9 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	logger.info("Destination server is: " + dest);
         	
-        	Connect_Message C = new Connect_Message(src, dest);
+        	Connect_Message C = new Connect_Message(src, dest, "CM");
         	C.channel = minimumWeightEdge;
+        	C.setFragmentLevel(fragmentLevel);
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
         	
             logger.info("server " + this.serverIndex + " Sending connectMessage to server " + dest);
@@ -346,7 +348,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         
     	logger.info("server " + this.serverIndex + " received connectMessage from server " + C.getSrc());
     	
-    	if(this.status == "Sleeping"){
+    	if(this.status.equals("Sleeping")){
             this.wakeup();
         }
         
@@ -354,16 +356,20 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		if(fragmentLevel<this.getFragmentLevel()) {
                 C.channel.setStatus("in_MST");
                 
+                logger.info("Calling empty message queue");
+                
+                emptyMessageQueue();
+                
                 logger.info("server " + this.serverIndex + " Sending initiateMessage");
                 
-                sendInitiateMessage(C.channel, this.fragmentLevel, C.channel.getWeight(), this.status);
+                sendInitiateMessage(C.channel, this.fragmentLevel, this.getFragmentName(), this.status);
                 
-                if (this.status == "find") {
+                if (this.status.equals("find")) {
                     numberReportMessagesExpected++;
                 }
             }
             else{
-                if(C.channel.getStatus() == "?_in_MST"){
+                if(C.channel.getStatus().equals("?_in_MST")){
                 	
                 	logger.info("Adding to message queue");
                 	
@@ -408,12 +414,15 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	logger.info("Destination server is: " + dest);
         	
-            Initiate_Message I = new Initiate_Message(src, dest);
+            Initiate_Message I = new Initiate_Message(src, dest, "IM");
             I.channel = E;
+            I.setFragmentLevel(L);
+            I.setFragmentName(w);
+            I.setStatus(status);
             
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
         	
-            logger.info("server " + this.serverIndex + " Sending connectMessage to server " + dest);
+            logger.info("server " + this.serverIndex + " Sending initiateMessage to server " + dest);
             
             destination.receiveInitiateMessage(I, L, w, status);
         	
@@ -444,6 +453,10 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         this.setStatus(status);
         int dest;
         
+        logger.info("Calling empty message queue");
+        
+        emptyMessageQueue();
+        
         logger.info("status is " + this.getStatus());
         
         try {
@@ -462,13 +475,13 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
             
         	for (int i = 0; i < neighbourEdges.size(); i++) {
                 
-            	if(!(neighbourEdges.get(i) == C.channel) && (neighbourEdges.get(i).getStatus() == "in_MST")){
+            	if((neighbourEdges.get(i).getWeight() != C.getChannel().getWeight()) && (neighbourEdges.get(i).getStatus().equals("in_MST"))){
                     
             		logger.info("server " + this.serverIndex + " Sending initiateMessage");
                     
             		sendInitiateMessage( neighbourEdges.get(i), this.getFragmentLevel(), this.getFragmentName(), this.status);
             		
-                    if(this.status == "find"){
+                    if(this.status.equals("find")){
                     	numberReportMessagesExpected++;
                     }
                 }
@@ -500,7 +513,8 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	try {
     		
         	for (int i = 0; i < neighbourEdges.size(); i++) {
-        		if (neighbourEdges.get(i).getStatus() == "?_in_MST" & neighbourEdges.get(i).getWeight() < testEdge.getWeight()) {
+        		logger.info("Weight is: " + neighbourEdges.get(i).getWeight());
+        		if (neighbourEdges.get(i).getStatus().equals("?_in_MST") && neighbourEdges.get(i).getWeight() < testEdge.getWeight()) {
         			this.testEdge = neighbourEdges.get(i);
         			
         		}
@@ -550,8 +564,10 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	logger.info("Destination server is: " + dest);
         	
-        	Test_Message T = new Test_Message(src, dest);
+        	Test_Message T = new Test_Message(src, dest, "TM");
         	T.channel = test;
+        	T.setFragmentLevel(fragmentLevel);
+        	T.setFragmentName(fragmentName);
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
         	
             logger.info("server " + this.serverIndex + " Sending testMessage to server " + dest);
@@ -576,7 +592,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	
     	logger.info("server " + this.serverIndex + " received testMessage from server " + T.getSrc());
     	
-    	if(this.status == "Sleeping"){
+    	if(this.status.equals("Sleeping")){
             this.wakeup();
     	}
     	
@@ -584,6 +600,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		
     		if (fragmentLevel > this.getFragmentLevel()) {
         		this.messageQueue.add(T);
+        		logger.info("ädded to message queue in receivetest");
         	}
         	
         	else {
@@ -596,9 +613,16 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         		else {
         			if (T.getChannel().getStatus().equals("?_in_MST")) {
         				T.getChannel().setStatus("not_in_MST");
+        				
+        				logger.info("Change status not_in_MST");
+        				
+        				logger.info("Calling empty message queue");
+        		        
+        		        emptyMessageQueue();
+        		        
         			}
         			
-        			if (!(this.getTestEdge().equals(T.getChannel()))) {
+        			if (!(this.getTestEdge().getWeight() == (T.getChannel().getWeight()))) {
         				
         				logger.info(this.getServerIndex() + " is sending rejectMessage");
         				
@@ -637,6 +661,11 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		if (this.getNumberReportMessagesExpected() == 0 & this.getTestEdge().getWeight() == 2000) {
         		this.setStatus("found");
         		
+        		logger.info("Calling empty message queue");
+		        
+		        emptyMessageQueue();
+		        
+        		
         		logger.info(this.getServerIndex() + " is sending reportMessage");
 				
         		for (int i = 0; i < neighbourEdges.size(); i++) {
@@ -674,8 +703,10 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	logger.info("Destination server is: " + dest);
         	
-        	Report_Message RE = new Report_Message(src, dest);
+        	Report_Message RE = new Report_Message(src, dest, "RepM");
         	RE.channel = toCore;
+        	RE.setWeight(w);
+        	
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
         	
             logger.info("server " + this.serverIndex + " Sending reportMessage to server " + dest);
@@ -713,7 +744,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         		}
         	}
     		
-    		if (RE.getChannel() != toCore) {
+    		if (RE.getChannel().getWeight() != toCore.getWeight()) {
     			this.numberReportMessagesExpected--;
     			
     			if (w < this.getMoeCandidate().getWeight()) {
@@ -772,6 +803,11 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 				    			
     			sendConnectMessage(this.getMoeCandidate(), this.getFragmentLevel());
     			this.getMoeCandidate().setStatus("in_MST");
+    			
+    			logger.info("Calling empty message queue");
+    	        
+    	        emptyMessageQueue();
+    	        
     		}
         	
     		
@@ -800,7 +836,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	logger.info("Destination server is: " + dest);
         	
-        	Change_Root_Message CR = new Change_Root_Message(src, dest);
+        	Change_Root_Message CR = new Change_Root_Message(src, dest, "CRM");
         	CR.channel = changeRoot;
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
         	
@@ -850,11 +886,11 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	logger.info("Destination server is: " + dest);
         	
-        	Accept_Message A = new Accept_Message(src, dest);
+        	Accept_Message A = new Accept_Message(src, dest, "AM");
         	A.channel = accept;
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
         	
-            logger.info("server " + this.serverIndex + " Sending rejectMessage to server " + dest);
+            logger.info("server " + this.serverIndex + " Sending acceptMessage to server " + dest);
             
             destination.receiveAcceptMessage(A); 
         	
@@ -915,7 +951,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	logger.info("Destination server is: " + dest);
         	
-        	Reject_Message R = new Reject_Message(src, dest);
+        	Reject_Message R = new Reject_Message(src, dest, "RejM");
         	R.channel = reject;
             Nodes_Interface destination = (Nodes_Interface) Naming.lookup(urls[dest]);
         	
@@ -946,6 +982,14 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		
     		if (R.getChannel().getStatus().equals("?_in_MST")) {
         		R.getChannel().setStatus("not_in_MST");
+        		
+        		logger.info("Change status not_in_MST");
+				
+        		
+        		logger.info("Calling empty message queue");
+                
+                emptyMessageQueue();
+                
         	}
         	
         	logger.info("server " + this.getServerIndex() + " is Calling test function");
@@ -957,6 +1001,77 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	}	catch (Exception e) {
     		e.printStackTrace();
     	}
+    	
+    }
+    
+    public void emptyMessageQueue() {
+    	
+    	if(!(this.messageQueue.isEmpty())) {
+        	Message pendingMessage = this.messageQueue.pop();
+            
+            switch (pendingMessage.getMessageType()) {
+            
+            case "AM":
+            	Accept_Message AM = (Accept_Message) pendingMessage;
+            	
+            	logger.info("Calling receiveAcceptMessage from message queue");
+            	
+            	receiveAcceptMessage(AM);
+            	break;
+            
+            case "CRM":
+            	Change_Root_Message CRM = (Change_Root_Message) pendingMessage;
+            	
+            	logger.info("Calling receiveChangeRootMessage from message queue");
+            	
+            	receiveChangeRootMessage(CRM);
+            	break;
+            
+            case "CM":
+            	Connect_Message CM = (Connect_Message) pendingMessage;
+            	
+            	logger.info("Calling receiveConnectMessage from message queue");
+            	
+            	receiveConnectMessage(CM, CM.getFragmentLevel());
+            	break;
+            
+            case "IM":
+            	Initiate_Message IM = (Initiate_Message) pendingMessage;
+            	
+            	logger.info("Calling receiveInitiateMessage from message queue");
+            	
+            	receiveInitiateMessage(IM, IM.getFragmentLevel(), IM.getFragmentName(), IM.getStatus());
+            	break;
+            
+            case "RejM":
+            	Reject_Message RejM = (Reject_Message) pendingMessage;
+            	
+            	logger.info("Calling receiveRejectMessage from message queue");
+            	
+            	receiveRejectMessage(RejM);
+            	break;
+            
+            case "RepM":
+            	Report_Message RepM = (Report_Message) pendingMessage;
+            	
+            	logger.info("Calling receiveReportMessage from message queue");
+            	
+            	receiveReportMessage(RepM, RepM.getWeight());
+            	break;
+            
+            case "TM":
+            	Test_Message TM = (Test_Message) pendingMessage;
+            	
+            	logger.info("Calling receiveTestMessage from message queue");
+            	
+            	receiveTestMessage(TM, TM.getFragmentLevel(), TM.getFragmentName());
+            	break;
+            
+            	
+            }
+            
+        }
+        
     	
     }
     

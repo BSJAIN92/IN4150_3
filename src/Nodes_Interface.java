@@ -4,7 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +22,8 @@ import java.util.Map;
 	/*
 	 * Reset Server
 	 */
-
+    
+    public LinkedList<Message> getMessageQueue() throws RemoteException;
 
 	public void reset() throws RemoteException;
 	

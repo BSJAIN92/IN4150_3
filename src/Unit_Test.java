@@ -60,7 +60,7 @@ public class Unit_Test {
 	
 	@Test
 	public void test() {
-		
+		/*
 		Nodes_Interface server1 = servers.get(0);
 		Nodes_Interface server2 = servers.get(1);
 		Nodes_Interface server3 = servers.get(2);
@@ -91,10 +91,52 @@ public class Unit_Test {
 		Nodes_Interface server28 = servers.get(27);
 		Nodes_Interface server29 = servers.get(28);
 		Nodes_Interface server30 = servers.get(29);
+		*/
 		
+		Nodes_Interface server1 = servers.get(0);
+		Nodes_Interface server2 = servers.get(1);
+		Nodes_Interface server3 = servers.get(2);
+		Nodes_Interface server4 = servers.get(3);
 		
 		
 		try {
+			Edges edge1 = new Edges(1);
+			Edges edge2 = new Edges(2);
+			Edges edge3 = new Edges(3);
+			Edges edge4 = new Edges(4);
+			
+			List<Edges_Interface>s1edges;
+			List<Edges_Interface>s2edges;
+			List<Edges_Interface>s3edges;
+			List<Edges_Interface>s4edges;
+			
+			s1edges = new LinkedList<Edges_Interface>();
+			s1edges.add(edge2);
+			s1edges.add(edge4);
+			
+			s2edges = new LinkedList<Edges_Interface>();
+			s2edges.add(edge2);
+			s2edges.add(edge3);
+			
+			s3edges = new LinkedList<Edges_Interface>();
+			s3edges.add(edge3);
+			s3edges.add(edge1);
+			
+			s4edges = new LinkedList<Edges_Interface>();
+			s4edges.add(edge4);
+			s4edges.add(edge1);
+			
+			server1.setNeighbourEdges(s1edges);
+			server2.setNeighbourEdges(s2edges);
+			server3.setNeighbourEdges(s3edges);
+			server4.setNeighbourEdges(s4edges);
+			
+			edge1.setConnectedNodes(server4,server3);
+			edge2.setConnectedNodes(server1,server2);
+			edge3.setConnectedNodes(server2,server3);
+			edge4.setConnectedNodes(server1,server4);
+			
+			/*
 			Edges edge1 = new Edges(1);
 			Edges edge2 = new Edges(2);
 			Edges edge3 = new Edges(3);
@@ -382,7 +424,7 @@ public class Unit_Test {
 			edge10.setConnectedNodes(server27,server28);
 			edge11.setConnectedNodes(server19,server24);
 			edge12.setConnectedNodes(server9,server14);
-			edge13.setConnectedNodes(server7,server17);
+			edge13.setConnectedNodes(server7,server12);
 			edge14.setConnectedNodes(server16,server17);
 			edge15.setConnectedNodes(server29,server30);
 			edge16.setConnectedNodes(server20,server25);
@@ -419,65 +461,122 @@ public class Unit_Test {
 			edge47.setConnectedNodes(server15,server20);
 			edge48.setConnectedNodes(server28,server29);
 			edge49.setConnectedNodes(server3,server8);
-			
-			System.out.println(server1.getNeighbourEdges().get(0).getStatus());
-			System.out.println(server1.getNeighbourEdges().get(0).getWeight());
+			*/
+			//System.out.println(server1.getNeighbourEdges().get(0).getStatus());
+			//System.out.println(server1.getNeighbourEdges().get(0).getWeight());
 			
 			server1.wakeup();
+			
+			Thread.sleep(10000);
+			
+			System.out.println(server1.getMessageQueue().size());
+			
+			
+			System.out.println(edge1.getStatus());
+			System.out.println(edge2.getStatus());
+			System.out.println(edge3.getStatus());
+			System.out.println(edge4.getStatus());
+			/*
+			System.out.println(edge5.getStatus());
+			System.out.println(edge6.getStatus());
+			System.out.println(edge7.getStatus());
+			System.out.println(edge8.getStatus());
+			System.out.println(edge9.getStatus());
+			System.out.println(edge10.getStatus());
+			System.out.println(edge11.getStatus());
+			System.out.println(edge12.getStatus());
+			System.out.println(edge13.getStatus());
+			System.out.println(edge14.getStatus());
+			System.out.println(edge15.getStatus());
+			System.out.println(edge16.getStatus());
+			System.out.println(edge17.getStatus());
+			System.out.println(edge18.getStatus());
+			System.out.println(edge19.getStatus());
+			System.out.println(edge20.getStatus());
+			System.out.println(edge21.getStatus());
+			System.out.println(edge22.getStatus());
+			System.out.println(edge23.getStatus());
+			System.out.println(edge24.getStatus());
+			System.out.println(edge25.getStatus());
+			System.out.println(edge26.getStatus());
+			System.out.println(edge27.getStatus());
+			System.out.println(edge28.getStatus());
+			System.out.println(edge29.getStatus());
+			System.out.println(edge30.getStatus());
+			System.out.println(edge31.getStatus());
+			System.out.println(edge32.getStatus());
+			System.out.println(edge33.getStatus());
+			System.out.println(edge34.getStatus());
+			System.out.println(edge35.getStatus());
+			System.out.println(edge36.getStatus());
+			System.out.println(edge37.getStatus());
+			System.out.println(edge38.getStatus());
+			System.out.println(edge39.getStatus());
+			System.out.println(edge40.getStatus());
+			System.out.println(edge41.getStatus());
+			System.out.println(edge42.getStatus());
+			System.out.println(edge43.getStatus());
+			System.out.println(edge44.getStatus());
+			System.out.println(edge45.getStatus());
+			System.out.println(edge46.getStatus());
+			System.out.println(edge47.getStatus());
+			System.out.println(edge48.getStatus());
+			System.out.println(edge49.getStatus());
+			*/
 			
 			Assert.assertTrue(edge1.getStatus().equals("in_MST"));
 			Assert.assertTrue(edge2.getStatus().equals("in_MST"));
 			Assert.assertTrue(edge3.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge4.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge5.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge6.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge7.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge8.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge9.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge10.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge11.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge12.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge13.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge14.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge15.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge16.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge17.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge18.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge19.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge20.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge21.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge22.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge23.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge24.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge25.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge26.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge27.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge28.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge29.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge30.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge31.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge32.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge33.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge34.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge35.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge36.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge37.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge38.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge39.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge40.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge41.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge42.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge43.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge44.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge45.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge46.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge47.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge48.getStatus().equals("not_in_MST"));
-			Assert.assertTrue(edge49.getStatus().equals("not_in_MST"));
+			Assert.assertTrue(edge4.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge5.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge6.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge7.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge8.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge9.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge10.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge11.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge12.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge13.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge14.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge15.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge16.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge17.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge18.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge19.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge20.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge21.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge22.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge23.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge24.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge25.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge26.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge27.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge28.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge29.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge30.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge31.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge32.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge33.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge34.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge35.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge36.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge37.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge38.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge39.getStatus().equals("in_MST"));
+			//Assert.assertTrue(edge40.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge41.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge42.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge43.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge44.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge45.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge46.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge47.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge48.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge49.getStatus().equals("not_in_MST"));
 
 			
-			System.out.println(server1.getNeighbourEdges().get(0).getStatus());
-			System.out.println(server1.getNeighbourEdges().get(1).getStatus());
+			//System.out.println(server1.getNeighbourEdges().get(0).getStatus());
+			//System.out.println(server1.getNeighbourEdges().get(1).getStatus());
 			
 			
 			
