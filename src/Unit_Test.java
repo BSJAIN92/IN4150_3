@@ -471,6 +471,10 @@ public class Unit_Test {
 			
 			System.out.println(server1.getMessageQueue().size());
 			
+			if (server1.getMessageQueue().size() > 0) {
+				server1.getMessageQueue().get(0).getMessageType();
+			}
+			
 			
 			System.out.println(edge1.getStatus());
 			System.out.println(edge2.getStatus());

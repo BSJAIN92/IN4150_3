@@ -3,6 +3,9 @@ import java.io.Serializable;
 
 public class Message implements Message_Interface, Serializable{
 	
+	private static final long serialVersionUID = 4745507L;
+
+	
 	/*
 	 * source node - node sending the message
 	 */

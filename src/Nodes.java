@@ -298,7 +298,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
     public void sendConnectMessage(Edges_Interface minimumWeightEdge, int fragmentLevel) {
         
-    	logger.info("Inside sendConnectMessage");
+    	logger.info("Inside sendConnectMessage of server " + this.getServerIndex());
     	
     	int src = this.serverIndex;
         int dest;
@@ -356,7 +356,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		if(fragmentLevel<this.getFragmentLevel()) {
                 C.channel.setStatus("in_MST");
                 
-                logger.info("Calling empty message queue");
+                logger.info("Calling empty message queue from receiveConnectMessage from server " + this.getServerIndex());
                 
                 emptyMessageQueue();
                 
@@ -371,7 +371,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
             else{
                 if(C.channel.getStatus().equals("?_in_MST")){
                 	
-                	logger.info("Adding to message queue");
+                	logger.info("Adding to message queue of server " + this.getServerIndex());
                 	
                 	messageQueue.add(C);
                 }
@@ -379,6 +379,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
                 	
                 	logger.info("server " + this.serverIndex + " Sending initiateMessage with find");
                     
+                	
                 	sendInitiateMessage(C.channel, this.getFragmentLevel()+1, C.channel.getWeight(), "find");
                 }
             }
@@ -399,11 +400,23 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
 
     public void sendInitiateMessage(Edges_Interface E, int L, int w, String status) {
         
-    	logger.info("Inside sendInitiateMessage");
+    	logger.info("Inside sendInitiateMessage of server " + this.getServerIndex());
     	
     	int src = this.serverIndex;
         int dest;
         
+        /*
+    	 * Test Changes
+    	 * this.fragmentLevel = this.fragmentLevel + 1;
+    	 * this.status = "find";
+    	 */
+    	
+    	this.fragmentLevel = L;
+    	this.status = "find";
+        
+    	logger.info("server " + this.getServerIndex() + " status is " + this.getStatus());
+        
+    	
         try {
         	if (E.getConnectedNodes().get(0).getServerIndex() == this.serverIndex){
                 dest = E.getConnectedNodes().get(1).getServerIndex();
@@ -453,11 +466,11 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         this.setStatus(status);
         int dest;
         
-        logger.info("Calling empty message queue");
+        logger.info("Calling empty message queue for server " + this.getServerIndex());
         
         emptyMessageQueue();
         
-        logger.info("status is " + this.getStatus());
+        logger.info("server " + this.getServerIndex() + " status is " + this.getStatus());
         
         try {
         	if(C.channel.getConnectedNodes().get(0).getServerIndex()==this.getServerIndex()){
@@ -488,8 +501,8 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
                 
             }
             
-        	logger.info("status is " + this.getStatus());
-        	
+        	logger.info("server " + this.getServerIndex() + " status is " + this.getStatus());
+            
             if(this.getStatus().equals("find")){
             	
             	logger.info("server " + this.getServerIndex() + " is Calling test function");
@@ -508,7 +521,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void test() {
     	
-    	logger.info("Inside test function");
+    	logger.info("Inside test function of server " + this.getServerIndex());
     	
     	try {
     		
@@ -524,13 +537,13 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         	
         	if (this.testEdge.getWeight() != 2000) {
         		
-        		logger.info("Sending testMessage");
+        		logger.info("Sending testMessage from server " + this.getServerIndex());
                 
         		sendTestMessage(this.testEdge, this.getFragmentLevel(), this.getFragmentName());
         	}
         	else {
         		
-        		logger.info("Calling report function");
+        		logger.info("Calling report function from server " + this.getServerIndex());
         		
         		report();
         	}
@@ -549,7 +562,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void sendTestMessage(Edges_Interface test, int fragmentLevel, int fragmentName){
     	
-    	logger.info("Inside sendTestMessage");
+    	logger.info("Inside sendTestMessage of server " + this.getServerIndex());
     	
     	int src = this.serverIndex;
         int dest;
@@ -600,7 +613,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		
     		if (fragmentLevel > this.getFragmentLevel()) {
         		this.messageQueue.add(T);
-        		logger.info("ädded to message queue in receivetest");
+        		logger.info("ädded to message queue in receivetest of server " + this.getServerIndex());
         	}
         	
         	else {
@@ -648,7 +661,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void report() {
     	
-    	logger.info("Inside report function");
+    	logger.info("Inside report function of server "  + this.getServerIndex());
     	
     	
     	
@@ -661,7 +674,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     		if (this.getNumberReportMessagesExpected() == 0 & this.getTestEdge().getWeight() == 2000) {
         		this.setStatus("found");
         		
-        		logger.info("Calling empty message queue");
+        		logger.info("Calling empty message queue from server " + this.getServerIndex());
 		        
 		        emptyMessageQueue();
 		        
@@ -688,7 +701,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void sendReportMessage(Edges_Interface toCore, int w) {
     	
-    	logger.info("Inside sendReportMessage function");
+    	logger.info("Inside sendReportMessage function of server " + this.getServerIndex());
     	
     	int src = this.serverIndex;
         int dest;
@@ -751,26 +764,35 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     				this.setMoeCandidate(RE.getChannel());
     			}
     			
-    			logger.info("Calling report function");
+    			logger.info("Calling report function from server " + this.getServerIndex());
         		
     			report();
     		}
     		else {
     			if (this.getStatus().equals("find")) {
+    				
+    				logger.info("Adding to message queue in report function of server " + this.getServerIndex());
+    				
     				this.messageQueue.add(RE);
     			}
     			else {
     				if (w > this.getMoeCandidate().getWeight() & w != 5000 & w != 3000) {
     					
-    					logger.info("Calling changeRoot function");
+    					logger.info("Calling changeRoot function from server " + this.getServerIndex());
     					
     					changeRoot();
     					
     				}
     				else {
     					if (w == this.getMoeCandidate().getWeight() & w == 5000) {
+    						
+    						logger.info("Inside HALT of server " + this.getServerIndex());
+    						
     						// Do nothing - HALT
     					}
+    					else {
+        					logger.info("Wrong place");
+        				}
     				}
     			}
     		}
@@ -787,7 +809,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void changeRoot() {
     	
-    	logger.info("Inside changeRoot function");
+    	logger.info("Inside changeRoot function of server" + this.getServerIndex());
     	
     	try {
     		
@@ -804,7 +826,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     			sendConnectMessage(this.getMoeCandidate(), this.getFragmentLevel());
     			this.getMoeCandidate().setStatus("in_MST");
     			
-    			logger.info("Calling empty message queue");
+    			logger.info("Calling empty message queue from server " + this.getServerIndex());
     	        
     	        emptyMessageQueue();
     	        
@@ -821,7 +843,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void sendChangeRootMessage (Edges_Interface changeRoot) {
     	
-    	logger.info("Inside sendChangeRootMessage function");
+    	logger.info("Inside sendChangeRootMessage function of server " + this.getServerIndex());
     	
     	int src = this.serverIndex;
         int dest;
@@ -862,7 +884,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	
     	logger.info("server " + this.serverIndex + " received changeRootMessage from server " + CR.getSrc());
     	
-    	logger.info("Calling changeRoot function");
+    	logger.info("Calling changeRoot function from server " + this.getServerIndex());
 		
 		changeRoot();
 		
@@ -871,7 +893,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void sendAcceptMessage(Edges_Interface accept) {
     	
-    	logger.info("Inside sendAcceptMessage function");
+    	logger.info("Inside sendAcceptMessage function of server " + this.getServerIndex());
     	
     	int src = this.serverIndex;
         int dest;
@@ -920,7 +942,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     			moeCandidate = A.getChannel();
     		}
     		
-    		logger.info("Calling report function");
+    		logger.info("Calling report function from server " + this.getServerIndex());
     		
     		report();
     		
@@ -936,7 +958,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     
     public void sendRejectMessage(Edges_Interface reject) {
     	
-    	logger.info("Inside sendRejectMessage function");
+    	logger.info("Inside sendRejectMessage function of server " + this.getServerIndex());
     	
     	int src = this.serverIndex;
         int dest;
