@@ -96,14 +96,14 @@ public class Unit_Test {
 		Nodes_Interface server1 = servers.get(0);
 		Nodes_Interface server2 = servers.get(1);
 		Nodes_Interface server3 = servers.get(2);
-		Nodes_Interface server4 = servers.get(3);
+		//Nodes_Interface server4 = servers.get(3);
 		
 		
 		try {
 			Edges edge1 = new Edges(1);
 			Edges edge2 = new Edges(2);
 			Edges edge3 = new Edges(3);
-			Edges edge4 = new Edges(4);
+			//Edges edge4 = new Edges(4);
 			
 			List<Edges_Interface>s1edges;
 			List<Edges_Interface>s2edges;
@@ -111,30 +111,30 @@ public class Unit_Test {
 			List<Edges_Interface>s4edges;
 			
 			s1edges = new LinkedList<Edges_Interface>();
-			s1edges.add(edge2);
-			s1edges.add(edge4);
+			s1edges.add(edge1);
+			s1edges.add(edge3);
 			
 			s2edges = new LinkedList<Edges_Interface>();
+			s2edges.add(edge1);
 			s2edges.add(edge2);
-			s2edges.add(edge3);
 			
 			s3edges = new LinkedList<Edges_Interface>();
+			s3edges.add(edge2);
 			s3edges.add(edge3);
-			s3edges.add(edge1);
 			
-			s4edges = new LinkedList<Edges_Interface>();
-			s4edges.add(edge4);
-			s4edges.add(edge1);
+			//s4edges = new LinkedList<Edges_Interface>();
+			//s4edges.add(edge4);
+			//s4edges.add(edge1);
 			
 			server1.setNeighbourEdges(s1edges);
 			server2.setNeighbourEdges(s2edges);
 			server3.setNeighbourEdges(s3edges);
-			server4.setNeighbourEdges(s4edges);
+			//server4.setNeighbourEdges(s4edges);
 			
-			edge1.setConnectedNodes(server4,server3);
-			edge2.setConnectedNodes(server1,server2);
-			edge3.setConnectedNodes(server2,server3);
-			edge4.setConnectedNodes(server1,server4);
+			edge1.setConnectedNodes(server1,server2);
+			edge2.setConnectedNodes(server2,server3);
+			edge3.setConnectedNodes(server1,server3);
+			//edge4.setConnectedNodes(server1,server4);
 			
 			/*
 			Edges edge1 = new Edges(1);
@@ -478,8 +478,8 @@ public class Unit_Test {
 			
 			System.out.println(edge1.getStatus());
 			System.out.println(edge2.getStatus());
-			System.out.println(edge3.getStatus());
-			System.out.println(edge4.getStatus());
+			//System.out.println(edge3.getStatus());
+			//System.out.println(edge4.getStatus());
 			/*
 			System.out.println(edge5.getStatus());
 			System.out.println(edge6.getStatus());
@@ -530,8 +530,8 @@ public class Unit_Test {
 			
 			Assert.assertTrue(edge1.getStatus().equals("in_MST"));
 			Assert.assertTrue(edge2.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge3.getStatus().equals("in_MST"));
-			Assert.assertTrue(edge4.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge3.getStatus().equals("not_in_MST"));
+			//Assert.assertTrue(edge4.getStatus().equals("not_in_MST"));
 			//Assert.assertTrue(edge5.getStatus().equals("in_MST"));
 			//Assert.assertTrue(edge6.getStatus().equals("in_MST"));
 			//Assert.assertTrue(edge7.getStatus().equals("in_MST"));

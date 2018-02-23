@@ -351,7 +351,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	if(this.status.equals("Sleeping")){
             this.wakeup();
         }
-        
+    	else {
     	try {
     		if(fragmentLevel<this.getFragmentLevel()) {
                 C.channel.setStatus("in_MST");
@@ -389,7 +389,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	}	catch (Exception e) {
     		e.printStackTrace();
     	}
-    	
+    	}
     }
 
 
@@ -608,7 +608,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	if(this.status.equals("Sleeping")){
             this.wakeup();
     	}
-    	
+    	else {
     	try {
     		
     		if (fragmentLevel > this.getFragmentLevel()) {
@@ -654,7 +654,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
     	}	catch (Exception e) {
     		e.printStackTrace();
     	}
-    	
+    	}
     	
     
     }
@@ -794,6 +794,7 @@ public class Nodes extends UnicastRemoteObject implements Nodes_Interface, Runna
         					logger.info("Wrong place");
         				}
     				}
+    				
     			}
     		}
     		
